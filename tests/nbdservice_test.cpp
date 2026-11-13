@@ -42,6 +42,10 @@ void NbdServiceTest::cleanup()
 
 void NbdServiceTest::customMountPointUsesPrivilegedMount()
 {
+    if (geteuid() == 0) {
+        QSKIP("Privileged commands run directly without pkexec as root.");
+    }
+
     QTemporaryDir tempDir;
     QVERIFY(tempDir.isValid());
     const QString binDir = tempDir.filePath(QStringLiteral("bin"));
@@ -89,6 +93,10 @@ void NbdServiceTest::customMountPointUsesPrivilegedMount()
 
 void NbdServiceTest::unlockUsesLuksOpenAndPassphraseOnStdin()
 {
+    if (geteuid() == 0) {
+        QSKIP("Privileged commands run directly without pkexec as root.");
+    }
+
     QTemporaryDir tempDir;
     QVERIFY(tempDir.isValid());
     const QString binDir = tempDir.filePath(QStringLiteral("bin"));

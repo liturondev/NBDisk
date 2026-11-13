@@ -28,6 +28,11 @@ fedora)
         kf6-ki18n-devel kf6-kwallet-devel kf6-kwidgetsaddons-devel kf6-kxmlgui-devel
     ;;
 opensuse)
+    # The image ships busybox-gawk, which conflicts with the gawk that
+    # qt6-base-devel pulls in through cups-devel -> rpm-build.
+    if rpm -q busybox-gawk >/dev/null 2>&1; then
+        zypper --non-interactive remove busybox-gawk
+    fi
     zypper --non-interactive install \
         cmake gcc-c++ make ninja \
         qt6-base-devel \
