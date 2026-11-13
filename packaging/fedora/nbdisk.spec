@@ -76,6 +76,10 @@ ctest --test-dir build --output-on-failure
 %install
 DESTDIR=%{buildroot} %{__cmake} --install build
 install -Dpm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
+%if 0%{?suse_version}
+# openSUSE skips its automatic stripping when no debug package is produced.
+find %{buildroot}%{_bindir} -type f -exec %{__strip} --strip-unneeded {} +
+%endif
 
 %post
 %systemd_post nbdisk-helper.service
