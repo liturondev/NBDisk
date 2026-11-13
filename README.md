@@ -149,9 +149,13 @@ no file has to be bumped first. The
 and RPM packages at that tag and attaches them to a GitHub release:
 
 ```sh
-git tag v0.2.0
+git tag -s v0.2.0 -m "v0.2.0"
 git push origin v0.2.0
 ```
+
+Release tags are GPG-signed, so GitHub marks them as verified and users can
+check them with `git tag -v v0.2.0`. The signing key is the maintainer's, and
+`git config tag.gpgSign true` makes a plain `git tag v0.2.0` sign as well.
 
 `NBDISK_VERSION` in `CMakeLists.txt` is only the fallback used by untagged
 branch builds, so bump it when `main` should report an upcoming version. The
