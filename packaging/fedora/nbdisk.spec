@@ -2,6 +2,10 @@
 # passes the tag-derived version with --define; the default below is only for
 # local builds.
 
+# Ship the application package only: rpm would otherwise build debuginfo and
+# debugsource subpackages.
+%global debug_package %{nil}
+
 %{!?_nbdisk_version:%global _nbdisk_version 0.1.0}
 %{!?_unitdir:%global _unitdir %{_prefix}/lib/systemd/system}
 %{!?_sysusersdir:%global _sysusersdir %{_prefix}/lib/sysusers.d}

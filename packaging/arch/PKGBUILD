@@ -7,6 +7,9 @@ pkgver=${NBDISK_VERSION:-0.1.0}
 pkgrel=1
 pkgdesc='Qt/KDE client for connecting and mounting remote NBD disks'
 arch=('x86_64' 'aarch64')
+# Ship the application package only: makepkg would otherwise split out a
+# separate nbdisk-debug package.
+options=('!debug')
 url='https://github.com/liturondev/NBDisk'
 license=('GPL-3.0-or-later')
 depends=(
