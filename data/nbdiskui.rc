@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gui name="nbdisk" version="1" translationDomain="nbdisk">
+    <MenuBar>
+        <Menu name="file">
+            <text>&amp;File</text>
+            <Action name="connect"/>
+            <Action name="disconnect"/>
+            <Separator/>
+            <Action name="open_mount"/>
+            <Separator/>
+            <Action name="file_quit"/>
+        </Menu>
+        <Menu name="device">
+            <text>&amp;Device</text>
+            <Action name="load_nbd_module"/>
+            <Action name="refresh"/>
+            <Separator/>
+            <Action name="mount"/>
+            <Action name="unmount"/>
+        </Menu>
+        <Menu name="settings">
+            <text>&amp;Settings</text>
+            <Action name="start_at_login"/>
+            <Action name="background_service"/>
+        </Menu>
+        <Menu name="help">
+            <text>&amp;Help</text>
+            <Action name="help_about_app"/>
+        </Menu>
+    </MenuBar>
+    <ToolBar name="mainToolBar">
+        <text>Main Toolbar</text>
+        <Action name="connect"/>
+        <Action name="disconnect"/>
+        <Separator/>
+        <Action name="mount"/>
+        <Action name="unmount"/>
+        <Action name="open_mount"/>
+        <Separator/>
+        <Action name="refresh"/>
+    </ToolBar>
+</gui>

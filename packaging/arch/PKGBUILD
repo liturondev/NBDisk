@@ -1,0 +1,52 @@
+# Maintainer: liturondev <339808872+liturondev@users.noreply.github.com>
+# Local-source PKGBUILD: run makepkg from this directory.
+
+pkgname=nbdisk
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Qt/KDE client for connecting and mounting remote NBD disks'
+arch=('x86_64' 'aarch64')
+url='https://github.com/liturondev/NBDisk'
+license=('GPL-3.0-or-later')
+depends=(
+    'qt6-base'
+    'kconfigwidgets'
+    'kcoreaddons'
+    'ki18n'
+    'kwallet'
+    'kwidgetsaddons'
+    'kxmlgui'
+    'udisks2'
+    'polkit'
+    'kmod'
+    'hicolor-icon-theme'
+    'breeze-icons'
+)
+makedepends=('cmake' 'ninja')
+optdepends=(
+    'nbd: nbd-client backend'
+    'qemu-img: qemu-nbd backend'
+    'cryptsetup: LUKS volume unlock and lock'
+    'polkit-kde-agent: graphical polkit authentication agent'
+)
+conflicts=("$pkgname-git" "$pkgname-bin")
+install="$pkgname.install"
+source=()
+sha256sums=()
+
+build() {
+    cmake -S "$startdir/../.." -B "$srcdir/build" -G Ninja \
+        -DCMAKE_BUILD_TYPE=None \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DBUILD_TESTING=ON
+    cmake --build "$srcdir/build"
+}
+
+check() {
+    ctest --test-dir "$srcdir/build" --output-on-failure
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install "$srcdir/build"
+    install -Dm644 "$startdir/../../LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

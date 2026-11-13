@@ -1,0 +1,21 @@
+[Unit]
+Description=NBDisk privileged helper
+Documentation=https://github.com/liturondev/NBDisk
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/nbdisk-helper
+Group=nbdisk
+RuntimeDirectory=nbdisk
+RuntimeDirectoryMode=0750
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=read-only
+ProtectSystem=full
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+[Install]
+WantedBy=multi-user.target

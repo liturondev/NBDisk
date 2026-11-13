@@ -1,0 +1,47 @@
+Source: nbdisk
+Section: utils
+Priority: optional
+Maintainer: liturondev <339808872+liturondev@users.noreply.github.com>
+Build-Depends:
+ build-essential,
+ debhelper-compat (= 13),
+ cmake,
+ qt6-base-dev,
+ libkf6config-dev,
+ libkf6configwidgets-dev,
+ libkf6coreaddons-dev,
+ libkf6i18n-dev,
+ libkf6wallet-dev,
+ libkf6widgetsaddons-dev,
+ libkf6xmlgui-dev,
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://github.com/liturondev/NBDisk
+Vcs-Browser: https://github.com/liturondev/NBDisk
+Vcs-Git: https://github.com/liturondev/NBDisk.git
+
+Package: nbdisk
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ udisks2,
+ polkitd | policykit-1,
+ kmod,
+Recommends:
+ nbd-client | qemu-utils,
+ cryptsetup,
+ kwalletmanager,
+ polkit-kde-agent-1
+Description: Qt/KDE client for connecting and mounting remote NBD disks
+ NBDisk is a Qt 6 / KDE Frameworks 6 desktop client that connects remote
+ Network Block Device (NBD) exports to local /dev/nbd devices and mounts
+ the resulting volumes.
+ .
+ It lists every NBD device the kernel exposes, connects and disconnects
+ exports with nbd-client or qemu-nbd, shows capacity and volume state,
+ and mounts or unmounts volumes through udisks or configured mount points.
+ LUKS-encrypted volumes can be unlocked with a passphrase remembered in
+ KDE Wallet, connection profiles reconnect at login through the bundled
+ background service, and an optional privileged helper avoids repeated
+ polkit prompts.

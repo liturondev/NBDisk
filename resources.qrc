@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file alias="nbdiskui.rc">data/nbdiskui.rc</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="io.github.liturondev.NBDisk.svg">data/io.github.liturondev.NBDisk.svg</file>
+    </qresource>
+</RCC>

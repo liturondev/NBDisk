@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>io.github.liturondev.NBDisk</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0-or-later</project_license>
+    <name>NBDisk</name>
+    <summary>Connect and manage remote NBD disks</summary>
+    <description>
+        <p>
+            NBDisk is a Qt/KDE client for the Network Block Device (NBD) protocol.
+            It connects remote exports to local /dev/nbd devices, shows their state,
+            and mounts or unmounts the resulting volumes through udisks.
+        </p>
+        <p>
+            Connections can be created with nbd-client or qemu-nbd, and privileged
+            operations are requested through polkit. Each device can keep a saved
+            profile, reconnect automatically at startup, and mount volumes at
+            configured mount points. LUKS-encrypted volumes can be unlocked and
+            locked with cryptsetup. NBDisk can also start at login.
+        </p>
+    </description>
+    <developer id="io.github.liturondev">
+        <name>liturondev</name>
+    </developer>
+    <launchable type="desktop-id">io.github.liturondev.NBDisk.desktop</launchable>
+    <url type="homepage">https://github.com/liturondev/NBDisk</url>
+    <url type="help">https://github.com/liturondev/NBDisk#readme</url>
+    <url type="bugtracker">https://github.com/liturondev/NBDisk/issues</url>
+    <url type="vcs-browser">https://github.com/liturondev/NBDisk</url>
+    <screenshots>
+        <screenshot type="default">
+            <caption>Main window with connected NBD disks and a saved profile</caption>
+            <image type="source" width="1280" height="759">https://raw.githubusercontent.com/liturondev/NBDisk/main/docs/screenshots/main-window.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Connecting a remote export with the connect wizard</caption>
+            <image type="source" width="680" height="440">https://raw.githubusercontent.com/liturondev/NBDisk/main/docs/screenshots/connect-wizard.png</image>
+        </screenshot>
+    </screenshots>
+    <provides>
+        <binary>nbdisk</binary>
+    </provides>
+    <categories>
+        <category>System</category>
+    </categories>
+    <content_rating type="oars-1.1"/>
+    <releases>
+        <release version="0.1.0" date="2026-11-08">
+            <description>
+                <p>Initial release.</p>
+            </description>
+        </release>
+    </releases>
+</component>

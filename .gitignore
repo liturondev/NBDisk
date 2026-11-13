@@ -1,0 +1,32 @@
+# Build directories
+/build/
+/build-*/
+/CMakeCache.txt
+/CMakeFiles/
+/compile_commands.json
+/.ninja_deps
+/.ninja_log
+
+# Editor and OS files
+*~
+*.swp
+.DS_Store
+
+# Arch Linux packaging output
+/packaging/arch/src/
+/packaging/arch/pkg/
+/packaging/arch/*.pkg.tar.zst
+/packaging/arch/*.pkg.tar.xz
+
+# Debian packaging output
+/debian/.debhelper/
+/debian/files
+/debian/tmp/
+/debian/nbdisk/
+/debian/debhelper-build-stamp
+/debian/*.debhelper
+/debian/*.substvars
+
+# RPM packaging output
+/rpmbuild/
+/dist/

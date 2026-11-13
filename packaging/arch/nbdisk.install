@@ -1,0 +1,72 @@
+post_install() {
+    # Package install scripts run before pacman's sysusers hook, so make sure
+    # the group exists before the helper service (Group=nbdisk) starts and
+    # before usermod uses it.
+    if ! getent group nbdisk >/dev/null 2>&1; then
+        if command -v systemd-sysusers >/dev/null 2>&1; then
+            systemd-sysusers >/dev/null 2>&1 || true
+        fi
+    fi
+    if ! getent group nbdisk >/dev/null 2>&1; then
+        groupadd -r nbdisk >/dev/null 2>&1 || true
+    fi
+
+    systemctl daemon-reload >/dev/null 2>&1 || true
+    systemctl enable --now nbdisk-helper.service >/dev/null 2>&1 || true
+
+    # Add the user who invoked the install (sudo/pkexec) to the helper group.
+    # Pacman runs this script as root, so use the original caller, never root.
+    installer="${SUDO_USER:-}"
+    if [ -z "$installer" ] && [ -n "${PKEXEC_UID:-}" ]; then
+        installer="$(getent passwd "$PKEXEC_UID" 2>/dev/null | cut -d: -f1)"
+    fi
+    if [ -z "$installer" ]; then
+        installer="$(logname 2>/dev/null || true)"
+    fi
+
+    if [ -n "$installer" ] && [ "$installer" != "root" ] \
+        && getent passwd "$installer" >/dev/null 2>&1; then
+        if usermod -aG nbdisk "$installer" >/dev/null 2>&1; then
+            echo "NBDisk: added '$installer' to the 'nbdisk' group."
+        else
+            echo "NBDisk: could not add '$installer' to the 'nbdisk' group."
+            echo "    Run: sudo usermod -aG nbdisk $installer"
+        fi
+    else
+        echo "NBDisk: add your user to the 'nbdisk' group to skip authentication"
+        echo "    prompts when disks reconnect at login:"
+        echo "    sudo usermod -aG nbdisk <your-user>"
+    fi
+
+    echo "NBDisk: log out and back in for the group membership to take effect."
+    echo
+}
+
+post_upgrade() {
+    systemctl daemon-reload >/dev/null 2>&1 || true
+    systemctl try-restart nbdisk-helper.service >/dev/null 2>&1 || true
+}
+
+pre_remove() {
+    systemctl disable --now nbdisk-helper.service >/dev/null 2>&1 || true
+
+    # The helper is gone, so remove its passwordless-operation grants. Keep the
+    # group itself: other local configuration may reference it, and sysusers
+    # recreates it if the package is installed again.
+    members="$(getent group nbdisk 2>/dev/null | cut -d: -f4)"
+    if [ -n "$members" ]; then
+        old_ifs="$IFS"
+        IFS=','
+        for member in $members; do
+            [ -n "$member" ] || continue
+            [ "$member" = "root" ] && continue
+            if gpasswd -d "$member" nbdisk >/dev/null 2>&1; then
+                echo "NBDisk: removed '$member' from the 'nbdisk' group."
+            else
+                echo "NBDisk: could not remove '$member' from the 'nbdisk' group."
+                echo "    Run: sudo gpasswd -d $member nbdisk"
+            fi
+        done
+        IFS="$old_ifs"
+    fi
+}

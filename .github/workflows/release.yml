@@ -1,0 +1,115 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  package-arch:
+    name: Package (Arch Linux)
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+    steps:
+      - name: Install git before checkout
+        run: pacman -Sy --noconfirm --needed git ca-certificates
+      - uses: actions/checkout@v4
+      - name: Build package
+        run: .github/ci/package-arch.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nbdisk-arch
+          path: dist/*.pkg.tar.zst
+          if-no-files-found: error
+
+  package-deb:
+    name: Package (Debian)
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+    steps:
+      - name: Install git before checkout
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v4
+      - name: Build package
+        run: .github/ci/package-deb.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nbdisk-debian
+          path: dist/*.deb
+          if-no-files-found: error
+
+  package-rpm:
+    name: Package (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Fedora
+            distro: fedora
+            image: fedora:latest
+          - name: openSUSE Tumbleweed
+            distro: opensuse
+            image: opensuse/tumbleweed
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - name: Install git before checkout
+        run: |
+          set -eu
+          case "${{ matrix.distro }}" in
+              fedora) dnf install -y git ca-certificates ;;
+              opensuse) zypper --non-interactive install git ca-certificates ;;
+          esac
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          set -eu
+          .github/ci/install-deps.sh ${{ matrix.distro }}
+          case "${{ matrix.distro }}" in
+              fedora) dnf install -y rpm-build ;;
+              opensuse) zypper --non-interactive install rpm-build ;;
+          esac
+      - name: Build package
+        run: .github/ci/package-rpm.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nbdisk-rpm-${{ matrix.distro }}
+          path: dist/rpms/*.rpm
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: [package-arch, package-deb, package-rpm]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      - name: Verify the tag matches the project version
+        run: |
+          set -eu
+          version="${GITHUB_REF_NAME#v}"
+          configured=$(sed -n 's/^project(NBDisk VERSION \([0-9][0-9.]*\).*/\1/p' CMakeLists.txt)
+          if [ "$version" != "$configured" ]; then
+              echo "::error::Tag ${GITHUB_REF_NAME} does not match CMakeLists.txt version ${configured}"
+              exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          gh release create "$GITHUB_REF_NAME" assets/* \
+              --title "NBDisk $VERSION" \
+              --generate-notes

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=NBDisk
+GenericName=NBD Disk Manager
+Comment=Connect and manage remote NBD disks
+Exec=nbdisk
+Icon=io.github.liturondev.NBDisk
+Terminal=false
+Categories=System;KDE;Qt;
+Keywords=nbd;disk;network;block;mount;server;
+StartupNotify=true
+X-KDE-StartupNotify=true
