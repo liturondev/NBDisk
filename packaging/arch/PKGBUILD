@@ -2,7 +2,8 @@
 # Local-source PKGBUILD: run makepkg from this directory.
 
 pkgname=nbdisk
-pkgver=0.1.0
+# The release workflow exports the tagged version; local builds use the default.
+pkgver=${NBDISK_VERSION:-0.1.0}
 pkgrel=1
 pkgdesc='Qt/KDE client for connecting and mounting remote NBD disks'
 arch=('x86_64' 'aarch64')
@@ -37,6 +38,7 @@ sha256sums=()
 build() {
     cmake -S "$startdir/../.." -B "$srcdir/build" -G Ninja \
         -DCMAKE_BUILD_TYPE=None \
+        -DNBDISK_VERSION="$pkgver" \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DBUILD_TESTING=ON
     cmake --build "$srcdir/build"

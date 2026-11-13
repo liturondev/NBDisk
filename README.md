@@ -135,21 +135,29 @@ rpmbuild -bb packaging/fedora/nbdisk.spec
 ```
 
 Every push and pull request runs the [`Build`](.github/workflows/build.yml)
-workflow: it compiles and tests NBDisk on Arch Linux, Debian, Ubuntu, Fedora,
-and openSUSE Tumbleweed, then uploads the Arch, Debian, and RPM packages as
-workflow artifacts.
+workflow: it compiles and tests NBDisk on Debian, Ubuntu, Fedora, and openSUSE
+Tumbleweed, then uploads the Arch, Debian, and RPM packages as workflow
+artifacts. Arch Linux is covered once, by the package job, because `makepkg`
+runs the test suite while building.
 
 ### Releases
 
-Releases are cut from version tags. The tag must match the version in
-`CMakeLists.txt`; the [`Release`](.github/workflows/release.yml) workflow then
-rebuilds the Arch, Debian, and RPM packages and attaches them to a GitHub
-release:
+Pushing a version tag is all a release needs: the tag is the version, and the
+packaging scripts pass it to CMake and to makepkg, debhelper, and rpmbuild, so
+no file has to be bumped first. The
+[`Release`](.github/workflows/release.yml) workflow builds the Arch, Debian,
+and RPM packages at that tag and attaches them to a GitHub release:
 
 ```sh
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ```
+
+`NBDISK_VERSION` in `CMakeLists.txt` is only the fallback used by untagged
+branch builds, so bump it when `main` should report an upcoming version. The
+release history in `data/io.github.liturondev.NBDisk.metainfo.xml` is still
+written by hand. To package a version locally, pass it to the scripts:
+`NBDISK_VERSION=0.2.0 .github/ci/package-deb.sh`.
 
 ### Build from source
 

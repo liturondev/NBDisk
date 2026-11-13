@@ -2,11 +2,8 @@
 # Builds the RPM package on Fedora or openSUSE Tumbleweed.
 set -euo pipefail
 
-version=$(sed -n 's/^project(NBDisk VERSION \([0-9][0-9.]*\).*/\1/p' CMakeLists.txt)
-if [ -z "$version" ]; then
-    echo "Could not read the version from CMakeLists.txt" >&2
-    exit 1
-fi
+. .github/ci/version.sh
+version=$(nbdisk_version)
 
 mkdir -p dist rpmbuild/BUILD rpmbuild/BUILDROOT rpmbuild/RPMS rpmbuild/SOURCES rpmbuild/SPECS rpmbuild/SRPMS
 

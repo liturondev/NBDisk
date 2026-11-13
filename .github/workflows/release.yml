@@ -7,6 +7,11 @@ on:
 permissions:
   contents: write
 
+env:
+  # Every packaging script takes its version from the tag that triggered this
+  # workflow, so releasing only requires pushing the tag.
+  NBDISK_VERSION: ${{ github.ref_name }}
+
 jobs:
   package-arch:
     name: Package (Arch Linux)
@@ -95,15 +100,17 @@ jobs:
         with:
           path: assets
           merge-multiple: true
-      - name: Verify the tag matches the project version
+      - name: Read the version from the tag
         run: |
           set -eu
           version="${GITHUB_REF_NAME#v}"
-          configured=$(sed -n 's/^project(NBDisk VERSION \([0-9][0-9.]*\).*/\1/p' CMakeLists.txt)
-          if [ "$version" != "$configured" ]; then
-              echo "::error::Tag ${GITHUB_REF_NAME} does not match CMakeLists.txt version ${configured}"
-              exit 1
-          fi
+          case "$version" in
+              [0-9]*.[0-9]*) ;;
+              *)
+                  echo "::error::Tag ${GITHUB_REF_NAME} is not a version tag like v1.2.3"
+                  exit 1
+                  ;;
+          esac
           echo "VERSION=$version" >> "$GITHUB_ENV"
       - name: Create GitHub release
         env:

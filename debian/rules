@@ -1,7 +1,13 @@
 #!/usr/bin/make -f
 
+# The release workflow exports NBDISK_VERSION from the pushed tag and rewrites
+# the top changelog entry in step. Local builds fall back to that changelog
+# entry, ignoring a release revision such as "-1".
+NBDISK_VERSION ?= $(shell awk 'NR==1{sub(/^nbdisk /,"");sub(/ .*/,"");gsub(/[()]/,"");sub(/-[0-9]+$$/,"");print}' debian/changelog)
+
 %:
 	dh $@
 
 override_dh_auto_configure:
-	dh_auto_configure -- -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+	dh_auto_configure -- -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DNBDISK_VERSION=$(NBDISK_VERSION)

@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(NBDisk VERSION 0.1.0 LANGUAGES CXX)
+# Release builds pass the tagged version with -DNBDISK_VERSION; the value below
+# is only the fallback for local and branch builds.
+set(NBDISK_VERSION "0.1.0" CACHE STRING "NBDisk version")
+if(NBDISK_VERSION STREQUAL "")
+    set(NBDISK_VERSION "0.1.0")
+endif()
+project(NBDisk VERSION ${NBDISK_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

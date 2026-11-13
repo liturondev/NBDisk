@@ -1,5 +1,6 @@
-# Portable spec file for Fedora and openSUSE Tumbleweed. The CI workflow
-# passes the version read from CMakeLists.txt with --define.
+# Portable spec file for Fedora and openSUSE Tumbleweed. The release workflow
+# passes the tag-derived version with --define; the default below is only for
+# local builds.
 
 %{!?_nbdisk_version:%global _nbdisk_version 0.1.0}
 %{!?_unitdir:%global _unitdir %{_prefix}/lib/systemd/system}
@@ -61,6 +62,7 @@ optional privileged helper avoids repeated polkit prompts.
 %{__cmake} -S . -B build \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+    -DNBDISK_VERSION=%{version} \
     -DBUILD_TESTING=ON
 %{__cmake} --build build --parallel
 
