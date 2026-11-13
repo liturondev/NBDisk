@@ -29,10 +29,10 @@ fedora)
     ;;
 opensuse)
     # The image ships busybox-gawk, which conflicts with the gawk that
-    # qt6-base-devel pulls in through cups-devel -> rpm-build.
-    if rpm -q busybox-gawk >/dev/null 2>&1; then
-        zypper --non-interactive remove busybox-gawk
-    fi
+    # qt6-base-devel pulls in through cups-devel -> rpm-build. Install the real
+    # gawk in the same transaction (git depends on it too) instead of removing
+    # the busybox provider on its own, which would take git with it.
+    zypper --non-interactive install --force-resolution gawk
     zypper --non-interactive install \
         cmake gcc-c++ make ninja \
         qt6-base-devel \
