@@ -13,8 +13,37 @@ env:
   NBDISK_VERSION: ${{ github.ref_name }}
 
 jobs:
+  verify-tag:
+    name: Verify signed tag
+    runs-on: ubuntu-latest
+    steps:
+      # GitHub only reports a signature as verified when the tag object is
+      # signed by a key registered on the maintainer's account, so this catches
+      # both an unsigned tag and a signed one from an unknown key.
+      - name: Check the tag signature
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -eu
+          repo="${GITHUB_REPOSITORY}"
+          type=$(gh api "repos/${repo}/git/ref/tags/${TAG}" --jq .object.type)
+          if [ "$type" != "tag" ]; then
+              echo "::error::Tag ${TAG} is not an annotated signed tag; create it with git tag -s"
+              exit 1
+          fi
+          sha=$(gh api "repos/${repo}/git/ref/tags/${TAG}" --jq .object.sha)
+          verified=$(gh api "repos/${repo}/git/tags/${sha}" --jq .verification.verified)
+          reason=$(gh api "repos/${repo}/git/tags/${sha}" --jq .verification.reason)
+          if [ "$verified" != "true" ]; then
+              echo "::error::Tag ${TAG} has an unverified signature (${reason}); is the signing key still registered on the maintainer's GitHub account?"
+              exit 1
+          fi
+          echo "Tag ${TAG} is signed and verified (${reason})."
+
   package-arch:
     name: Package (Arch Linux)
+    needs: verify-tag
     runs-on: ubuntu-latest
     container:
       image: archlinux:base-devel
@@ -32,6 +61,7 @@ jobs:
 
   package-deb:
     name: Package (Debian)
+    needs: verify-tag
     runs-on: ubuntu-latest
     container:
       image: debian:trixie
@@ -52,6 +82,7 @@ jobs:
 
   package-rpm:
     name: Package (${{ matrix.name }})
+    needs: verify-tag
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

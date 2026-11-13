@@ -155,7 +155,10 @@ git push origin v0.2.0
 
 Release tags are GPG-signed, so GitHub marks them as verified and users can
 check them with `git tag -v v0.2.0`. The signing key is the maintainer's, and
-`git config tag.gpgSign true` makes a plain `git tag v0.2.0` sign as well.
+`git config tag.gpgSign true` makes a plain `git tag v0.2.0` sign as well. The
+workflow's first job asks GitHub whether the pushed tag carries a verified
+signature and fails before building anything otherwise, so an unsigned tag
+pushed from another machine cannot publish a release.
 
 `NBDISK_VERSION` in `CMakeLists.txt` is only the fallback used by untagged
 branch builds, so bump it when `main` should report an upcoming version. The
